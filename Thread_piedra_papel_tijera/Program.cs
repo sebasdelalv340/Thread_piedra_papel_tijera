@@ -7,56 +7,88 @@ namespace PiedraPapelTijera
 {
     class Program
     {
-        static readonly List<string> movimientos = new List<string> { "piedra", "papel", "tijera" };
-        static int victoriasHilo1 = 0;
-        static int victoriasHilo2 = 0;
-        static readonly object lockObj = new object();
+        static readonly List<string> Movimientos = new List<string> { "piedra", "papel", "tijera" };
+        static int _victoriasHiloMain = 0;
+        static int _victoriasHiloSecundario = 0;
+        static string _movimientoHiloSecundario = string.Empty;
+        static readonly object LockObj = new object();
+        static bool _listoParaJugar = false;
 
         static void Main()
         {
-            Thread hilo1 = new Thread(Jugar);
-            Thread hilo2 = new Thread(Jugar);
+            Thread hiloSecundario = new Thread(JugarSecundario);
+            hiloSecundario.Start();
 
-            hilo1.Start("Hilo 1");
-            hilo2.Start("Hilo 2");
-
-            hilo1.Join();
-            hilo2.Join();
-
-            Console.WriteLine($"El juego ha terminado. ¡{(victoriasHilo1 > victoriasHilo2 ? "Hilo 1" : "Hilo 2")} ganó!");
-        }
-
-        static void Jugar(object nombreHilo)
-        {
             Random random = new Random();
-            while (victoriasHilo1 < 3 && victoriasHilo2 < 3)
+
+            while (_victoriasHiloMain < 3 && _victoriasHiloSecundario < 3)
             {
-                lock (lockObj)
+                // Generar movimiento del hilo principal
+                string movimientoHiloMain = Movimientos[random.Next(Movimientos.Count)];
+
+                // Preparar el hilo secundario para jugar
+                lock (LockObj)
                 {
-                    if (victoriasHilo1 >= 3 || victoriasHilo2 >= 3) break;
+                    _movimientoHiloSecundario = string.Empty;
+                    _listoParaJugar = true;
+                    Monitor.Pulse(LockObj); // Despertar el hilo secundario
+                }
 
-                    string movimientoHilo1 = movimientos[random.Next(movimientos.Count)];
-                    string movimientoHilo2 = movimientos[random.Next(movimientos.Count)];
+                // Esperar a que el hilo secundario haga su jugada
+                lock (LockObj)
+                {
+                    while (_listoParaJugar)
+                    {
+                        Monitor.Wait(LockObj);
+                    }
 
-                    Console.WriteLine($"[{nombreHilo}] Jugador 1 juega {movimientoHilo1} contra Jugador 2 que juega {movimientoHilo2}");
-
-                    int resultado = DeterminarGanador(movimientoHilo1, movimientoHilo2);
+                    // Determinar el ganador de la ronda
+                    Console.WriteLine($"Main juega {movimientoHiloMain} contra Secundario que juega {_movimientoHiloSecundario}");
+                    int resultado = DeterminarGanador(movimientoHiloMain, _movimientoHiloSecundario);
                     if (resultado == 1)
                     {
-                        victoriasHilo1++;
-                        Console.WriteLine($"Jugador 1 gana esta ronda. Marcador: {victoriasHilo1}-{victoriasHilo2}");
+                        _victoriasHiloMain++;
+                        Console.WriteLine($"Main gana esta ronda. Marcador: Main {_victoriasHiloMain} - Secundario {_victoriasHiloSecundario}");
                     }
                     else if (resultado == -1)
                     {
-                        victoriasHilo2++;
-                        Console.WriteLine($"Jugador 2 gana esta ronda. Marcador: {victoriasHilo1}-{victoriasHilo2}");
+                        _victoriasHiloSecundario++;
+                        Console.WriteLine($"Secundario gana esta ronda. Marcador: Main {_victoriasHiloMain} - Secundario {_victoriasHiloSecundario}");
                     }
                     else
                     {
                         Console.WriteLine("Empate en esta ronda.");
                     }
                 }
-                Thread.Sleep(500); // Pausa para simular el tiempo de juego
+
+                Thread.Sleep(500); // Pausa para hacer más legible la salida
+            }
+
+            Console.WriteLine($"El juego ha terminado. ¡{(_victoriasHiloMain > _victoriasHiloSecundario ? "Main" : "Secundario")} ganó!");
+
+            // Finalizar el hilo secundario
+            hiloSecundario.Join();
+        }
+
+        static void JugarSecundario()
+        {
+            Random random = new Random();
+
+            while (_victoriasHiloMain < 3 && _victoriasHiloSecundario < 3)
+            {
+                lock (LockObj)
+                {
+                    // Esperar hasta que el hilo principal esté listo
+                    while (!_listoParaJugar)
+                    {
+                        Monitor.Wait(LockObj);
+                    }
+
+                    // Hacer la jugada del hilo secundario
+                    _movimientoHiloSecundario = Movimientos[random.Next(Movimientos.Count)];
+                    _listoParaJugar = false;
+                    Monitor.Pulse(LockObj); // Notificar al hilo principal
+                }
             }
         }
 
@@ -64,14 +96,13 @@ namespace PiedraPapelTijera
         {
             if (movimiento1 == movimiento2)
                 return 0; // Empate
-            if (
-                (movimiento1 == "piedra" && movimiento2 == "tijera") ||
+            if ((movimiento1 == "piedra" && movimiento2 == "tijera") ||
                 (movimiento1 == "tijera" && movimiento2 == "papel") ||
-                (movimiento1 == "papel" && movimiento2 == "piedra")
-                )
-                return 1; // Gana el jugador 1
-            return -1; // Gana el jugador 2
+                (movimiento1 == "papel" && movimiento2 == "piedra"))
+                return 1; // Gana el movimiento 1
+            return -1; // Gana el movimiento 2
         }
     }
 }
+
 
