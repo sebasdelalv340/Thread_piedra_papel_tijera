@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Thread_piedra_papel_tijera")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2665fdf271b9439b7c338c5a034e7a3d5ea4ae03")]
 [assembly: System.Reflection.AssemblyProductAttribute("Thread_piedra_papel_tijera")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Thread_piedra_papel_tijera")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

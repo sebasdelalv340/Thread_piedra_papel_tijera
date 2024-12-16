@@ -12,3 +12,4 @@ C:\Users\Sebas\RiderProjects\Thread_piedra_papel_tijera\Thread_piedra_papel_tije
 C:\Users\Sebas\RiderProjects\Thread_piedra_papel_tijera\Thread_piedra_papel_tijera\obj\Debug\net8.0\Thread_piedra_papel_tijera.pdb
 C:\Users\Sebas\RiderProjects\Thread_piedra_papel_tijera\Thread_piedra_papel_tijera\obj\Debug\net8.0\Thread_piedra_papel_tijera.genruntimeconfig.cache
 C:\Users\Sebas\RiderProjects\Thread_piedra_papel_tijera\Thread_piedra_papel_tijera\obj\Debug\net8.0\ref\Thread_piedra_papel_tijera.dll
+C:\Users\Sebas\RiderProjects\Thread_piedra_papel_tijera\Thread_piedra_papel_tijera\obj\Debug\net8.0\Thread_piedra_papel_tijera.sourcelink.json
